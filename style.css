@@ -1,0 +1,58 @@
+/* Color palette from https://colorhunt.co/palette/9112bcae75dae9e294fffcb8
+	 #9112BC, #AE75DA, #E9E294, #FFFFCB, #8
+	 (last color in palette is malformed on site; we use five harmonious tones)
+*/
+:root{
+	--purple-1:#9112BC;
+	--purple-2:#AE75DA;
+	--warm-1:#E9E294;
+	--warm-2:#FFFFCB;
+	--muted:#3a3a3a;
+	--bg:#fffdf6;
+}
+
+*{box-sizing:border-box}
+body{font-family:Inter, system-ui, Arial, sans-serif;margin:0;background:var(--bg);color:var(--muted);}
+.container{max-width:1000px;margin:0 auto;padding:20px}
+
+.site-header{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:var(--warm-2);padding:14px 0}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.brand{margin:0;font-size:20px}
+.top-nav{display:flex;gap:8px}
+.nav-btn{background:transparent;border:2px solid rgba(255,255,255,.18);color:inherit;padding:8px 12px;border-radius:8px;cursor:pointer}
+.nav-btn.active{background:var(--warm-2);color:var(--purple-1);border-color:transparent}
+
+.page{display:none;padding:24px 0}
+.page.active{display:block}
+
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.filters input,.filters select,.filters input[type=number]{padding:8px;border-radius:8px;border:1px solid #ddd}
+.price-range{display:flex;gap:6px;align-items:center}
+.btn{background:var(--purple-1);color:var(--warm-2);border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+.btn-outline{background:transparent;border:1px solid var(--purple-1);color:var(--purple-1)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.card{background:white;border-radius:10px;padding:12px;box-shadow:0 6px 20px rgba(17,12,32,.06)}
+.card img{width:100%;height:140px;object-fit:cover;border-radius:8px}
+.card h3{margin:8px 0 4px}
+.muted{color:#666;font-size:14px}
+
+.profile-card{display:flex;gap:18px;background:linear-gradient(180deg,rgba(255,255,255,.9),#fff);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(17,12,32,.06)}
+.profile-left{width:220px;text-align:center}
+.avatar{width:80px;height:80px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--purple-2);color:var(--warm-2);font-weight:700;font-size:20px}
+.avatar-lg{width:110px;height:110px;font-size:28px}
+.avatar-img{object-fit:cover;border-radius:50%;display:inline-block}
+.photo-upload{display:flex;flex-direction:column;align-items:center;gap:8px}
+.photo-controls{display:flex;gap:8px}
+.photo-controls .btn{padding:6px 10px;font-size:14px}
+.profile-right{flex:1}
+.chips{list-style:none;padding:0;display:flex;gap:8px;flex-wrap:wrap}
+.chips li{background:var(--warm-1);padding:6px 10px;border-radius:999px;font-size:13px}
+.review{border-top:1px solid #eee;padding-top:8px;margin-top:8px}
+
+.site-footer{padding:16px 0;text-align:center;color:#555}
+
+@media (max-width:720px){
+	.profile-card{flex-direction:column}
+	.profile-left{width:100%}
+}

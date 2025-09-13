@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Travelfree</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container header-inner">
+				<h1 class="brand">Travelfree</h1>
+				<nav class="top-nav">
+					<a href="index.html" class="nav-btn active">Listings</a>
+					<a href="traveler.html" class="nav-btn">Traveler</a>
+					<a href="host.html" class="nav-btn">Host</a>
+				</nav>
+			</div>
+		</header>
+
+		<main class="container">
+			<!-- Accommodation Listing Page -->
+			<section id="page-list" class="page active">
+				<h2>Available stays</h2>
+				<div class="filters">
+					<input id="search" placeholder="Search by title or location" />
+					<select id="typeFilter">
+						<option value="any">Any type</option>
+						<option value="apartment">Apartment</option>
+						<option value="room">Private room</option>
+						<option value="house">House</option>
+					</select>
+					<select id="ratingFilter">
+						<option value="0">Any rating</option>
+						<option value="4">4+ stars</option>
+						<option value="3">3+ stars</option>
+					</select>
+					<div class="price-range">
+						<label>Min</label>
+						<input id="minPrice" type="number" min="0" value="0" />
+						<label>Max</label>
+						<input id="maxPrice" type="number" min="0" value="500" />
+					</div>
+					<button id="resetFilters" class="btn btn-outline">Reset</button>
+				</div>
+
+				<div id="listings" class="grid"></div>
+			</section>
+
+			
+
+		<footer class="site-footer">
+			<div class="container">© 2025 Travelfree</div>
+		</footer>
+
+		<script src="script.js"></script>
+	</body>
+</html>

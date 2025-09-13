@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Host — Travelfree</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <h1 class="brand">Travelfree</h1>
+        <nav class="top-nav">
+          <a href="index.html" class="nav-btn">Listings</a>
+          <a href="traveler.html" class="nav-btn">Traveler</a>
+          <a href="host.html" class="nav-btn active">Host</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section>
+        <div class="profile-card">
+          <div class="profile-left">
+            <div class="photo-upload">
+              <img id="hostPhotoPreview" class="avatar avatar-lg avatar-img" data-default="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'&gt;&lt;rect width='100%25' height='100%25' fill='%239112BC'/&gt;&lt;text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='64' fill='%23ffffff'&gt;MR&lt;/text&gt;&lt;/svg&gt;" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%25' height='100%25' fill='%239112BC'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='64' fill='%23ffffff'>MR</text></svg>" alt="Marco Rossi" />
+              <div class="photo-controls">
+                <label class="btn btn-outline" for="hostPhotoInput">Choose photo</label>
+                <input id="hostPhotoInput" type="file" accept="image/*" style="display:none" />
+                <button id="hostPhotoRemove" class="btn" type="button">Remove</button>
+              </div>
+            </div>
+            <h3>Host: Marco Rossi</h3>
+            <p class="muted">Verified host • Milan</p>
+          </div>
+          <div class="profile-right">
+            <h4>Accommodation details</h4>
+            <ul>
+              <li>Cozy 2-bedroom apartment in the city center</li>
+              <li>Capacity: 4 guests</li>
+              <li>Amenities: Wi‑Fi, Kitchen, Washer</li>
+            </ul>
+
+            <h4>Reviews</h4>
+            <div class="review">
+              <strong>Emma</strong>
+              <span class="muted"> — 5 stars</span>
+              <p>Great host and a spotless apartment. Close to public transport.</p>
+            </div>
+            <div class="review">
+              <strong>Liam</strong>
+              <span class="muted"> — 4 stars</span>
+              <p>Comfortable stay, quick responses.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© 2025 Travelfree</div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
