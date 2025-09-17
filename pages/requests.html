@@ -1,0 +1,143 @@
+<!-- requests.html
+     Travelfree - Requests Page (Page 7)
+     Shows traveler & host requests with Pending / Accepted / Declined statuses
+-->
+
+<!doctype html>
+<html lang="en" x-data="requestsPage()">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Travelfree — Requests</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    :root {
+      --brand-primary: #9112BC;
+      --brand-soft:    #AE75DA;
+      --brand-cta:     #E9E294;
+      --page-bg:       #FFFCB8;
+      --text-dark:     #111827;
+    }
+    .card-shadow { box-shadow: 0 8px 18px rgba(17,24,39,0.06); }
+    .badge { font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; }
+    .badge-pending { background: var(--brand-soft); color: white; }
+    .badge-accepted { background: var(--brand-cta); color: var(--text-dark); }
+    .badge-declined { background: #E5E7EB; color: #374151; }
+  </style>
+</head>
+<body class="antialiased bg-[#FFFCB8] text-[#111827] font-inter">
+
+  <!-- Header -->
+  <header class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+    <h1 class="font-poppins text-xl text-[#9112BC]">My Requests</h1>
+    <nav class="space-x-4 text-sm">
+      <a href="../index.html" class="hover:underline">Home</a>
+      <a href="single-listing.html" class="hover:underline">Listing</a>
+      <a href="chat.html" class="hover:underline">Chat</a>
+    </nav>
+  </header>
+
+  <!-- Main content -->
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Tabs -->
+    <div class="flex space-x-2 mb-6">
+      <button @click="activeTab = 'all'" :class="tabClass('all')">All</button>
+      <button @click="activeTab = 'pending'" :class="tabClass('pending')">Pending</button>
+      <button @click="activeTab = 'accepted'" :class="tabClass('accepted')">Accepted</button>
+      <button @click="activeTab = 'declined'" :class="tabClass('declined')">Declined</button>
+    </div>
+
+    <!-- Requests list -->
+    <div class="space-y-4">
+      <template x-for="req in filteredRequests()" :key="req.id">
+        <div class="bg-white p-4 rounded-lg card-shadow flex justify-between items-center animate__animated animate__fadeIn">
+          <!-- Left: listing & user -->
+          <div class="flex items-center gap-4">
+            <img :src="req.img" alt="Listing image" class="w-16 h-16 rounded-md object-cover border"/>
+            <div>
+              <h3 class="font-semibold" x-text="req.listing"></h3>
+              <p class="text-sm text-gray-600">Host: <span x-text="req.host"></span></p>
+              <p class="text-xs text-gray-500" x-text="'Sent on ' + req.date"></p>
+            </div>
+          </div>
+
+          <!-- Middle: status -->
+          <div>
+            <span :class="statusClass(req.status)" x-text="capitalize(req.status)"></span>
+          </div>
+
+          <!-- Right: actions -->
+          <div class="flex gap-2">
+            <!-- Traveler sees Cancel on pending -->
+            <button x-show="req.role==='traveler' && req.status==='pending'"
+              @click="updateStatus(req,'cancelled')"
+              class="px-3 py-1 border rounded-md text-xs">Cancel</button>
+
+            <!-- Host sees Accept/Decline on pending -->
+            <template x-if="req.role==='host' && req.status==='pending'">
+              <div class="flex gap-2">
+                <button @click="updateStatus(req,'accepted')" class="px-3 py-1 bg-[#9112BC] text-white rounded-md text-xs">Accept</button>
+                <button @click="updateStatus(req,'declined')" class="px-3 py-1 border rounded-md text-xs">Decline</button>
+              </div>
+            </template>
+
+            <!-- Open chat if accepted -->
+            <a x-show="req.status==='accepted'" href="chat.html" class="px-3 py-1 bg-[#E9E294] text-[#111827] rounded-md text-xs">Open Chat</a>
+          </div>
+        </div>
+      </template>
+    </div>
+  </main>
+
+  <!-- Alpine.js logic -->
+  <script>
+    function requestsPage(){
+      return {
+        activeTab: 'all',
+       requests: [
+  { id:1, listing:'Cozy Room near Park', host:'Aisha', date:'2025-09-12', status:'pending', img:'../assets/img/req1.jpg', role:'traveler' },
+  { id:2, listing:'Shared Flat in City', host:'Ali', date:'2025-09-10', status:'accepted', img:'../assets/img/req2.jpg', role:'traveler' },
+  { id:3, listing:'Studio Downtown', host:'Fatima', date:'2025-09-09', status:'declined', img:'../assets/img/req3.jpg', role:'traveler' },
+  { id:4, listing:'Guest House', host:'Hamza', date:'2025-09-11', status:'pending', img:'../assets/img/req4.jpg', role:'host' }
+],
+        filteredRequests(){
+          if(this.activeTab==='all') return this.requests;
+          return this.requests.filter(r => r.status===this.activeTab);
+        },
+        tabClass(tab){
+          return (this.activeTab===tab) 
+            ? 'px-3 py-1 bg-[#9112BC] text-white rounded-md text-sm'
+            : 'px-3 py-1 bg-white border text-sm rounded-md';
+        },
+        statusClass(status){
+          if(status==='pending') return 'badge badge-pending';
+          if(status==='accepted') return 'badge badge-accepted';
+          if(status==='declined') return 'badge badge-declined';
+          if(status==='cancelled') return 'badge badge-declined';
+        },
+        updateStatus(req,newStatus){
+          req.status=newStatus;
+          // TODO: replace with API call: PUT /requests/:id/status
+          // fetch('/api/requests/'+req.id, {method:'PUT', body:JSON.stringify({status:newStatus})})
+        },
+        capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+      }
+    }
+  </script>
+</body>
+</html>

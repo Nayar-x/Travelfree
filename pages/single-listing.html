@@ -1,0 +1,398 @@
+<!-- index.html
+     Single Accommodation page (Listing Detail) for Travelfree
+     Pages to follow: Requests (7) -> Chat (8)
+     Notes:
+       - Replace placeholder images in `assets/img/` with your actual images.
+       - Replace mock API calls (fetch to /api/...) with your real backend endpoints.
+       - This file uses Tailwind Play CDN -> arbitrary colors like bg-[#FFFCB8] work.
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Travelfree — Listing detail</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- Tailwind Play CDN: lightweight dev usage -->
+  <script>
+    // Tailwind config before loading the CDN
+    tailwind = { config: {
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+            poppins: ['Poppins', 'sans-serif']
+          }
+        }
+      }
+    } }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+  <style>
+    :root{
+      --brand-primary: #9112BC;  /* deep purple */
+      --brand-soft:    #AE75DA;  /* lavender */
+      --brand-cta:     #E9E294;  /* yellow highlight */
+      --page-bg:       #FFFCB8;  /* warm canvas */
+      --text-dark:     #111827;  /* good readable dark */
+    }
+
+    /* small helpers */
+    .card-shadow { box-shadow: 0 10px 25px rgba(17,24,39,0.06); }
+    .focus-ring { outline: 2px solid rgba(145,18,188,0.16); outline-offset: 2px; }
+
+    /* ensure the CTA on yellow has enough padding / border radius */
+    .btn-cta {
+      background: var(--brand-cta);
+      color: var(--text-dark);
+      border-radius: 9999px;
+      padding: .5rem 1rem;
+      font-weight: 600;
+    }
+
+    /* small rule bullet style */
+    .rule-dot { width:8px; height:8px; border-radius:999px; background:var(--brand-primary); display:inline-block; margin-right:.6rem; }
+
+    /* lightbox transition */
+    .lightbox-enter { animation: var(--tw-animation) 180ms ease; }
+  </style>
+</head>
+<body class="antialiased bg-[#FFFCB8] text-[#111827] font-inter">
+
+  <!-- PARTICLES BACKGROUND (absolute) -->
+  <div id="particles-js" class="fixed inset-0 -z-10"></div>
+
+  <!-- Top nav (simple) -->
+  <header class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:linear-gradient(135deg,var(--brand-primary),var(--brand-soft)); color:white; font-weight:700;">TF</div>
+      <div>
+        <a href="#" class="text-lg font-poppins text-[#9112BC]">Travelfree</a>
+        <p class="text-xs text-gray-600">Community stays</p>
+      </div>
+    </div>
+
+    <nav class="hidden md:flex items-center gap-4 text-sm">
+      <a class="px-3 py-2 rounded-md text-[#111827] hover:bg-white/60" href="#">Browse</a>
+      <a class="px-3 py-2 rounded-md text-[#111827] hover:bg-white/60" href="#">Community</a>
+      <a class="px-3 py-2 rounded-md text-[#111827] hover:bg-white/60" href="#">Profile</a>
+      <!-- NOTE: team uses single-file or multi-page -> link accordingly -->
+      <button class="ml-2 btn-cta shadow-sm" aria-label="Sign in">Sign in</button>
+    </nav>
+  </header>
+
+  <!-- MAIN: Listing detail -->
+  <main x-data="listingPage()" class="max-w-6xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Gallery -->
+      <section class="lg:col-span-2">
+        <div class="rounded-xl overflow-hidden card-shadow bg-white">
+          <!-- large image -->
+          <div class="relative">
+            <img :src="images[activeImage]" alt="Room photo" class="w-full h-72 md:h-[520px] object-cover" />
+
+            <!-- gallery overlays -->
+            <div class="absolute top-3 left-3 flex gap-2">
+              <span class="bg-white/70 text-[#9112BC] px-3 py-1 rounded-md text-sm font-medium">Private room</span>
+              <span class="bg-white/70 text-[#111827] px-3 py-1 rounded-md text-sm">Hosted by Aisha Khan</span>
+            </div>
+
+            <!-- open lightbox -->
+            <button @click="openLightbox = true" class="absolute bottom-3 right-3 bg-white/90 text-[#111827] px-3 py-2 rounded-md shadow-sm">
+              <i class="fa fa-expand mr-2"></i> View
+            </button>
+          </div>
+
+          <!-- thumbnails -->
+          <div class="px-4 py-3 flex gap-3 overflow-x-auto bg-[#FFFCB8]">
+            <template x-for="(img, i) in images" :key="i">
+              <button @click="activeImage = i" :class="{'ring-2 ring-offset-2 ring-[#9112BC]': activeImage === i}" class="flex-shrink-0 rounded-md overflow-hidden w-28 h-20 border border-white">
+                <img :src="img" alt="" class="w-full h-full object-cover"/>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Lightbox modal (full-screen) -->
+        <div
+          x-show="openLightbox"
+          x-transition
+          @keydown.escape.window="openLightbox = false"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style="background: rgba(0,0,0,0.6);"
+          x-cloak
+          role="dialog" aria-modal="true" aria-label="Room photos">
+          <div class="max-w-4xl w-full bg-white rounded-lg overflow-hidden">
+            <div class="flex items-center justify-between p-3 border-b">
+              <div class="flex items-center gap-3">
+                <h3 class="font-poppins text-lg text-[#9112BC]">Photos</h3>
+                <span class="text-sm text-gray-500">Gallery</span>
+              </div>
+              <div>
+                <button @click="openLightbox = false" class="p-2 text-gray-600 hover:text-gray-900" aria-label="Close lightbox">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-4">
+              <img :src="images[activeImage]" alt="Full view" class="w-full h-[60vh] object-contain"/>
+              <div class="flex gap-2 mt-3 overflow-x-auto">
+                <template x-for="(img,i) in images" :key="i">
+                  <button @click="activeImage = i" :class="{'ring-2 ring-[#AE75DA]': activeImage===i}" class="w-24 h-16 rounded-md overflow-hidden">
+                    <img :src="img" alt="" class="w-full h-full object-cover" />
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Details & CTA -->
+      <aside class="lg:col-span-1">
+        <div class="bg-white rounded-xl p-6 card-shadow">
+          <!-- Title & host -->
+          <div class="flex items-start gap-4">
+            <div class="flex-1">
+              <h1 class="text-2xl font-poppins text-[#9112BC]">Cozy Private Room near Old Town</h1>
+              <p class="text-sm text-gray-600 mt-1">A quiet spot for travelers who love local experiences.</p>
+
+              <div class="mt-3 flex items-center gap-3">
+                <img :src="host.avatar" alt="Host avatar" class="w-10 h-10 rounded-full object-cover border" />
+                <div>
+                  <div class="text-sm font-semibold">Aisha Khan</div>
+                  <div class="text-xs text-gray-500">Host rating: <span class="font-medium text-[#AE75DA]">4.8</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm text-gray-500">Status</div>
+              <div class="mt-1 inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium" :class="{'bg-[#E9E294] text-[#111827]': listing.available, 'bg-gray-200 text-gray-600': !listing.available}">
+                <i class="fa fa-door-open"></i>
+                <span x-text="listing.available ? 'Available' : 'Unavailable'"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- meta row -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <span class="text-xs px-3 py-1 rounded-full border" style="border-color:rgba(145,18,188,0.08)"><i class="fa fa-user-friends mr-2"></i>Private room</span>
+            <span class="text-xs px-3 py-1 rounded-full border" style="border-color:rgba(174,117,218,0.12)"><i class="fa fa-map-marker-alt mr-2"></i>Downtown • 0.6km from station</span>
+            <span class="text-xs px-3 py-1 rounded-full border" style="border-color:rgba(233,226,148,0.12)"><i class="fa fa-language mr-2"></i>English, Urdu</span>
+          </div>
+
+          <!-- Description -->
+          <div class="mt-4 text-sm text-gray-700">
+            <p x-text="listing.description"></p>
+          </div>
+
+          <!-- Rules (collapsible) -->
+          <div class="mt-4">
+            <button @click="showRules = !showRules" class="w-full text-left px-3 py-2 rounded-md border border-gray-200" :aria-expanded="showRules.toString()">
+              <div class="flex justify-between items-center">
+                <span class="font-medium">House Rules</span>
+                <i :class="showRules ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"></i>
+              </div>
+            </button>
+
+            <div x-show="showRules" x-transition class="mt-3 text-sm text-gray-700">
+              <ul class="space-y-2">
+                <li><span class="rule-dot"></span>No smoking indoors</li>
+                <li><span class="rule-dot"></span>Quiet hours 10pm–7am</li>
+                <li><span class="rule-dot"></span>Respect shared spaces</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- CTA area -->
+          <div class="mt-6">
+            <!-- if user is listing host -->
+            <div x-show="isHost" class="text-sm text-gray-600">
+              You are the host for this listing.
+            </div>
+
+            <div x-show="!isHost" class="space-y-3">
+              <div x-show="hasActiveRequest" class="p-3 rounded-md bg-[#FEF9C3] border border-[#EDE8A0] text-sm">
+                <strong>Request sent — Pending</strong>
+                <div class="text-xs text-gray-600 mt-1">You can cancel the request from your Requests page.</div>
+              </div>
+
+              <button
+                :disabled="isHost || hasActiveRequest"
+                @click="openRequestModal()"
+                class="w-full btn-cta rounded-md text-center flex items-center justify-center gap-3 shadow-sm"
+                :class="(isHost || hasActiveRequest) ? 'opacity-60 cursor-not-allowed' : ''"
+                aria-disabled="false"
+              >
+                <i class="fa fa-paper-plane text-sm"></i>
+                Send Request
+              </button>
+            </div>
+          </div>
+
+          <!-- small footer -->
+          <div class="mt-4 text-xs text-gray-500">
+            <div>Reviews: <span class="text-[#AE75DA] font-medium">See host profile</span></div>
+            <button @click="reportListing()" class="mt-2 text-red-500 text-sm"><i class="fa fa-flag mr-2"></i>Report listing</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Request modal -->
+    <div x-show="requestModalOpen" @keydown.escape.window="requestModalOpen=false" x-cloak>
+      <div class="fixed inset-0 z-40 flex items-end md:items-center justify-center p-4" style="background: rgba(0,0,0,0.45);">
+        <div class="bg-white rounded-lg w-full max-w-2xl p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-poppins text-lg text-[#9112BC]">Send a stay request</h3>
+            <button @click="requestModalOpen=false" class="p-2 text-gray-600"><i class="fa fa-times"></i></button>
+          </div>
+
+          <p class="text-sm text-gray-600 mt-2">Introduce yourself — keep it friendly. The host will see this message when deciding.</p>
+
+          <form @submit.prevent="submitRequest()" class="mt-3 space-y-3">
+            <div>
+              <label class="text-xs font-medium text-gray-700">Message to host <span class="text-gray-400 text-xs">(max 300 chars)</span></label>
+              <textarea x-model="requestMessage" maxlength="300" rows="5" class="mt-2 block w-full border rounded-md p-3 text-sm focus:outline-none focus-ring" aria-label="Message to host"></textarea>
+              <div class="text-xs text-gray-400 text-right" x-text="requestMessage.length + ' / 300'"></div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button :disabled="sendingRequest || requestMessage.trim().length < 10" class="btn-cta px-4 py-2 rounded-md shadow-sm" :class="sendingRequest ? 'opacity-60 cursor-wait' : ''">
+                <i class="fa fa-paper-plane mr-2"></i>
+                <span x-text="sendingRequest ? 'Sending...' : 'Send request'"></span>
+              </button>
+
+              <button type="button" @click="requestModalOpen=false" class="px-3 py-2 rounded-md border text-sm">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast / alert -->
+    <div x-show="toast.show" x-transition class="fixed bottom-6 right-6 z-50">
+      <div :class="{'bg-green-50 border-green-200 text-green-800': toast.type==='success', 'bg-red-50 border-red-200 text-red-800': toast.type==='error'}" class="p-3 rounded-md border shadow-sm">
+        <div class="text-sm" x-text="toast.message"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Inline script: Alpine component + Particles config -->
+  <script>
+    function listingPage(){
+      return {
+        // demo images - replace with assets/img/* or real URLs
+        images: [
+          '../assets/img/room1.webp',
+          '../assets/img/room2.webp',
+          '../assets/img/room3.webp'
+        ],
+        activeImage: 0,
+        openLightbox: false,
+        showRules: false,
+        requestModalOpen: false,
+        sendingRequest: false,
+        requestMessage: 'Hi! I am visiting for two nights and would love to stay. I am tidy and respectful of house rules.',
+        toast: { show:false, message:'', type:'success' },
+        // demo data - in real app replace with API-provided data
+        host: { name: 'Aisha Khan', avatar: '../assets/img/host_avatar.jpg' },
+        listing: { id: 123, available: true, description: 'Cozy room near cafes and city center, private bed, shared kitchen.' },
+        isHost: false,           // set true if current user is the listing host
+        hasActiveRequest: false, // toggles to true after sending a request (simulate API)
+        // open modal
+        openRequestModal(){
+          if(this.isHost) return;
+          this.requestModalOpen = true;
+          // set a helpful default message if empty
+          if(!this.requestMessage) this.requestMessage = 'Hi, I would love to stay at your place on these dates...';
+        },
+        // simulate sending request
+        submitRequest(){
+          if(this.requestMessage.trim().length < 10) {
+            this.showToast('Please add a short message (min 10 chars)', 'error');
+            return;
+          }
+          this.sendingRequest = true;
+
+          // --- MOCK API: replace with your real endpoint ---
+          // Example:
+          // fetch('/api/requests', { method:'POST', body: JSON.stringify({ listing_id: this.listing.id, message: this.requestMessage }) })
+          //   .then(...)
+          setTimeout(() => {
+            this.sendingRequest = false;
+            this.requestModalOpen = false;
+            this.hasActiveRequest = true;
+            this.showToast('Request sent — host will review it.', 'success');
+          }, 900);
+        },
+        // small helper to show status to the user
+        showToast(msg, type='success'){
+          this.toast.message = msg;
+          this.toast.type = type;
+          this.toast.show = true;
+          setTimeout(()=> this.toast.show = false, 3500);
+        },
+        // report listing - simulated
+        reportListing(){
+          this.showToast('Listing reported. Our moderators will review.', 'success');
+        }
+      }
+    }
+
+    // Particles.js inline config
+    document.addEventListener('DOMContentLoaded', ()=> {
+      if(window.particlesJS){
+        particlesJS('particles-js', {
+          "particles": {
+            "number": { "value": 28, "density": {"enable": true, "value_area": 800} },
+            "color": { "value": ["#9112BC", "#AE75DA", "#E9E294"] },
+            "shape": { "type": "circle" },
+            "opacity": { "value": 0.7, "random": true, "anim": {"enable": false} },
+            "size": { "value": 4, "random": true },
+            "line_linked": { "enable": false },
+            "move": { "enable": true, "speed": 1.2, "random": true, "out_mode": "out" }
+          },
+          "interactivity": {
+            "detect_on": "canvas",
+            "events": { "onhover": {"enable": true, "mode": "repulse"}, "onclick": {"enable": false} },
+            "modes": {"repulse": {"distance": 80}}
+          },
+          "retina_detect": true
+        });
+      }
+    });
+  </script>
+
+  <!-- Deployment & integration notes -->
+  <!--
+    Integration tips:
+     - Put actual images in assets/img/room1.jpg, room2.jpg, room3.jpg, host_avatar.jpg
+     - Replace mock fetch in submitRequest() with your backend API call:
+         POST /requests { listing_id, message }
+       then update hasActiveRequest based on server response.
+     - Link Requests and Chat pages into header / navigation once built.
+     - Accessibility: test color contrast for CTA on yellow; if needed add a tiny dark overlay on CTA or use a purple CTA variant.
+  -->
+
+</body>
+</html>

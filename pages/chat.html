@@ -1,0 +1,117 @@
+<!-- chat.html
+     Travelfree - Chat Page (Page 8)
+     Messaging system unlocked after request approval
+-->
+
+<!doctype html>
+<html lang="en" x-data="chatPage()">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Travelfree — Chat</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    :root {
+      --brand-primary: #9112BC;
+      --brand-soft:    #AE75DA;
+      --brand-cta:     #E9E294;
+      --page-bg:       #FFFCB8;
+      --text-dark:     #111827;
+    }
+    .bubble-traveler { background: var(--brand-soft); color: white; }
+    .bubble-host { background: var(--brand-cta); color: var(--text-dark); }
+    .chat-scroll { height: calc(100vh - 10rem); overflow-y: auto; }
+  </style>
+</head>
+<body class="antialiased bg-[#FFFCB8] text-[#111827] font-inter">
+
+  <!-- Header -->
+  <header class="bg-white border-b">
+    <div class="max-w-4xl mx-auto flex items-center justify-between p-4">
+      <div class="flex items-center gap-3">
+      <img src="../assets/img/chat_host.jpg" alt="Host avatar" class="w-10 h-10 rounded-full object-cover border"/>
+        <div>
+          <h1 class="font-poppins text-lg text-[#9112BC]">Chat with Aisha</h1>
+          <p class="text-xs text-gray-500">Request accepted </p>
+        </div>
+      </div>
+      <nav class="space-x-3 text-sm">
+        <a href="../index.html" class="hover:underline">Home</a>
+        <a href="requests.html" class="hover:underline">Requests</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Chat body -->
+  <main class="max-w-4xl mx-auto px-4 py-4 flex flex-col h-[calc(100vh-5rem)]">
+    <div class="flex-1 chat-scroll space-y-4 pr-2" x-ref="chatContainer">
+      <!-- Messages -->
+      <template x-for="msg in messages" :key="msg.id">
+        <div :class="msg.from==='traveler' ? 'flex justify-end' : 'flex justify-start'">
+          <div :class="msg.from==='traveler' ? 'bubble-traveler rounded-lg p-3 max-w-xs animate__animated animate__fadeInRight' : 'bubble-host rounded-lg p-3 max-w-xs animate__animated animate__fadeInLeft'">
+            <p class="text-sm" x-text="msg.text"></p>
+            <p class="text-[10px] mt-1 text-gray-700" x-text="msg.time"></p>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Composer -->
+    <form @submit.prevent="sendMessage()" class="mt-4 flex items-center gap-2">
+      <input type="text" x-model="newMessage" placeholder="Type a message..."
+        class="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none"/>
+      <label class="cursor-pointer">
+        <i class="fa fa-image text-[#9112BC] text-lg"></i>
+        <input type="file" class="hidden" @change="attachImage($event)"/>
+      </label>
+      <button class="px-4 py-2 rounded-full bg-[#9112BC] text-white text-sm">
+        <i class="fa fa-paper-plane"></i>
+      </button>
+    </form>
+  </main>
+
+  <!-- Alpine.js logic -->
+  <script>
+    function chatPage(){
+      return {
+        messages: [
+          {id:1, from:'host', text:'Hello! Happy to host you ', time:'10:00 am'},
+          {id:2, from:'traveler', text:'Thanks! I will arrive tomorrow evening.', time:'10:02 am'}
+        ],
+        newMessage: '',
+        sendMessage(){
+          if(this.newMessage.trim().length===0) return;
+          this.messages.push({id:Date.now(), from:'traveler', text:this.newMessage, time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+          this.newMessage='';
+          this.$nextTick(()=> this.$refs.chatContainer.scrollTop = this.$refs.chatContainer.scrollHeight);
+          // TODO: replace with POST /chats/:id/messages
+        },
+        attachImage(e){
+          const file = e.target.files[0];
+          if(file && file.size < 5*1024*1024){ // limit 5MB
+            this.messages.push({id:Date.now(), from:'traveler', text:'📷 Image uploaded: '+file.name, time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+            // TODO: upload to server, send URL in message
+          } else {
+            alert("Image too large (max 5MB).");
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
